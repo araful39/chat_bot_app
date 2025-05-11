@@ -1,7 +1,33 @@
+import 'package:chat_bot_app/features/gemini_service.dart';
 import 'package:flutter/material.dart';
 
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
+
+  @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  final TextEditingController _controller = TextEditingController();
+  final GeminiService _geminiService = GeminiService();
+  final List<Map<String, dynamic>> _messages = [];
+
+  void _sendMessage() async {
+    final userText = _controller.text.trim();
+    if (userText.isEmpty) return;
+
+    setState(() {
+      _messages.insert(0, {"text": userText, "isMe": true});
+      _controller.clear();
+    });
+
+    final botReply = await _geminiService.getGeminiResponse(userText);
+
+    setState(() {
+      _messages.insert(0, {"text": botReply, "isMe": false});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,43 +47,54 @@ class ChatScreen extends StatelessWidget {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: messages.length,
               reverse: true,
+              itemCount: _messages.length,
               itemBuilder: (context, index) {
-                final message = messages[index];
+                final message = _messages[index];
                 return Row(
                   mainAxisAlignment:
                       message["isMe"]
                           ? MainAxisAlignment.end
-                          : MainAxisAlignment.start,
+                          : MainAxisAlignment.end,
                   children: [
                     if (!message["isMe"])
-                      CircleAvatar(
-                        backgroundImage: AssetImage('assets/bot.png'),
-                      ),
-                    Container(
-                      padding: EdgeInsets.all(12),
-                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: message["isMe"] ? Colors.teal : Colors.grey[300],
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(15),
-                          topRight: Radius.circular(15),
-                          bottomLeft:
-                              message["isMe"]
-                                  ? Radius.circular(15)
-                                  : Radius.zero,
-                          bottomRight:
-                              message["isMe"]
-                                  ? Radius.zero
-                                  : Radius.circular(15),
+                      Align(
+                        alignment: Alignment.bottomLeft,
+                        child: CircleAvatar(
+                          backgroundImage: AssetImage('assets/bot.png'),
                         ),
                       ),
-                      child: Text(
-                        message["text"],
-                        style: TextStyle(
-                          color: message["isMe"] ? Colors.white : Colors.black,
-                          fontSize: 16,
+                    Flexible(
+                      child: Container(
+                        padding: EdgeInsets.all(12),
+                        margin: EdgeInsets.symmetric(
+                          vertical: 5,
+                          horizontal: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color:
+                              message["isMe"] ? Colors.teal : Colors.grey[300],
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            topRight: Radius.circular(15),
+                            bottomLeft:
+                                message["isMe"]
+                                    ? Radius.circular(15)
+                                    : Radius.zero,
+                            bottomRight:
+                                message["isMe"]
+                                    ? Radius.zero
+                                    : Radius.circular(15),
+                          ),
+                        ),
+                        child: Text(
+                          message["text"],
+
+                          style: TextStyle(
+                            color:
+                                message["isMe"] ? Colors.white : Colors.black,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ),
@@ -76,6 +113,7 @@ class ChatScreen extends StatelessWidget {
                 ),
                 Expanded(
                   child: TextField(
+                    controller: _controller,
                     decoration: InputDecoration(
                       hintText: "Type a message...",
                       border: OutlineInputBorder(
@@ -96,7 +134,7 @@ class ChatScreen extends StatelessWidget {
                   backgroundColor: Colors.teal,
                   child: IconButton(
                     icon: Icon(Icons.send, color: Colors.white),
-                    onPressed: () {},
+                    onPressed: _sendMessage,
                   ),
                 ),
               ],
@@ -107,9 +145,3 @@ class ChatScreen extends StatelessWidget {
     );
   }
 }
-
-final List<Map<String, dynamic>> messages = [
-  {"text": "Hey! How's it going?", "isMe": false},
-  {"text": "I'm good, just working on a project.", "isMe": true},
-  {"text": "That sounds great! Need any help?", "isMe": false},
-];
