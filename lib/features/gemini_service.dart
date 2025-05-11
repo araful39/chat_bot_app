@@ -2,25 +2,27 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class GeminiService {
-  final String _apiKey = ''; // Replace with your actual API key
+  final String _apiKey = 'your api key...';
 
-  Future<String> getGeminiResponse(String userInput) async {
+  Future<String> getGeminiResponse(List<Map<String, dynamic>> history) async {
     final url = Uri.parse(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$_apiKey',
+      'https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=$_apiKey',
     );
+
+    final contents =
+        history.map((message) {
+          return {
+            "role": message['isMe'] ? "user" : "model",
+            "parts": [
+              {"text": message['text']},
+            ],
+          };
+        }).toList();
 
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        "contents": [
-          {
-            "parts": [
-              {"text": userInput},
-            ],
-          },
-        ],
-      }),
+      body: json.encode({"contents": contents}),
     );
 
     if (response.statusCode == 200) {
