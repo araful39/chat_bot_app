@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class GeminiService {
-  final String _apiKey = 'your api key...';
+  final String _apiKey = '';
 
   Future<String> getGeminiResponse(List<Map<String, dynamic>> history) async {
     final url = Uri.parse(

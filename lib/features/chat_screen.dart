@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'gemini_service.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -13,6 +15,38 @@ class _ChatScreenState extends State<ChatScreen> {
   final GeminiService _geminiService = GeminiService();
   final List<Map<String, dynamic>> _messages = [];
 
+  @override
+  void initState() {
+    super.initState();
+    _loadMessages();
+  }
+
+  Future<void> _saveMessages() async {
+    final prefs = await SharedPreferences.getInstance();
+    final encoded = json.encode(_messages);
+    await prefs.setString('chat_messages', encoded);
+  }
+
+  Future<void> _loadMessages() async {
+    final prefs = await SharedPreferences.getInstance();
+    final data = prefs.getString('chat_messages');
+    if (data != null) {
+      final List<dynamic> decoded = json.decode(data);
+      setState(() {
+        _messages.clear();
+        _messages.addAll(decoded.map((e) => Map<String, dynamic>.from(e)));
+      });
+    }
+  }
+
+  Future<void> _clearMessages() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('chat_messages');
+    setState(() {
+      _messages.clear();
+    });
+  }
+
   void _sendMessage() async {
     final userText = _controller.text.trim();
     if (userText.isEmpty) return;
@@ -21,6 +55,7 @@ class _ChatScreenState extends State<ChatScreen> {
       _messages.insert(0, {"text": userText, "isMe": true});
       _controller.clear();
     });
+    await _saveMessages();
 
     final history = _messages.reversed.toList();
 
@@ -29,6 +64,7 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       _messages.insert(0, {"text": botReply, "isMe": false});
     });
+    await _saveMessages();
   }
 
   Widget _buildMessage(Map<String, dynamic> message) {
@@ -80,6 +116,13 @@ class _ChatScreenState extends State<ChatScreen> {
           ],
         ),
         backgroundColor: Colors.teal,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.delete_forever),
+            onPressed: _clearMessages,
+            tooltip: "Clear chat",
+          ),
+        ],
       ),
       body: Column(
         children: [
