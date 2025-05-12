@@ -1,16 +1,17 @@
 # chat_bot_app
 
-A new Flutter project.
+## How I Built It
 
-## Getting Started
+I followed a step-by-step development workflow to build this app from scratch:
 
-This project is a starting point for a Flutter application.
+- Initialized a Flutter project using `flutter create chat_bot_app`.
+- Designed a clean chat interface using `ListView.builder` and `TextField`.
+- Used `SharedPreferences` to store and load chat history locally.
+- Integrated the Gemini API (`gemini-2.0-flash`) via HTTP POST using the `http` package.
+- Converted messages to Gemini's required format with roles (`user` and `model`).
+- Displayed bot replies and user messages with distinct styling.
+- Implemented message persistence across app sessions.
+- Added a clear chat button using `IconButton`.
+- Managed user input and message list using `StatefulWidget`.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![App Screenshot](assets/chat_screen.png)
