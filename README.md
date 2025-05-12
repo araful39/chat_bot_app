@@ -14,4 +14,4 @@ I followed a step-by-step development workflow to build this app from scratch:
 - Added a clear chat button using `IconButton`.
 - Managed user input and message list using `StatefulWidget`.
 
-![App Screenshot](assets/chat_screen.png)
+<img src="assets/chat_screen.png" alt="App Screenshot" width="300"/>
