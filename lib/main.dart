@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Chat bot by Gemini',
+      title: 'Chat bot by Gemini make Raju',
       debugShowCheckedModeBanner: false,
       home: ChatScreen(),
     );
