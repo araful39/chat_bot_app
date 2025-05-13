@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Chat bot by Gemini make Raju',
+      //Md Araful islam raju
       debugShowCheckedModeBanner: false,
       home: ChatScreen(),
     );
